@@ -17,11 +17,11 @@ int main() {
     try
     {
         #if FPGA_SIMULATOR
-            auto selector = sycl::ext::intel::fpga_simulator_selector_v;
+        sycl::ext::intel::fpga_simulator_selector selector;
         #elif FPGA_HARDWARE
-            auto selector = sycl::ext::intel::fpga_selector_v;
-        #else
-            auto selector = sycl::ext::intel::fpga_emulator_selector_v;
+        sycl::ext::intel::fpga_selector selector;
+        #else // FPGA_EMULATOR
+        sycl::ext::intel::fpga_emulator_selector selector;
         #endif
 
         sycl::queue q(selector);

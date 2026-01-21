@@ -1,7 +1,9 @@
-#include <sycl/sycl.hpp>
+#include <CL/sycl.hpp>
 #include <iostream>
 #include <vector>
 #include <chrono>
+
+using namespace sycl;
 
 // 矩阵维度
 constexpr int M = 64;  // A的行数
@@ -36,10 +38,10 @@ void verifyResult(const std::vector<DataType>& C) {
 int main() {
     try {
         // 创建SYCL队列
-        sycl::queue q(sycl::default_selector_v);
+        queue q(default_selector{});
         
         std::cout << "Running on device: " 
-                  << q.get_device().get_info<sycl::info::device::name>() 
+                  << q.get_device().get_info<info::device::name>() 
                   << std::endl;
 
         // 初始化矩阵
@@ -54,17 +56,17 @@ int main() {
         auto start = std::chrono::high_resolution_clock::now();
 
         // 创建缓冲区用于SYCL数据传输
-        sycl::buffer<DataType, 1> bufA(A.data(), sycl::range<1>(M * K));
-        sycl::buffer<DataType, 1> bufB(B.data(), sycl::range<1>(K * N));
-        sycl::buffer<DataType, 1> bufC(C.data(), sycl::range<1>(M * N));
+        buffer<DataType, 1> bufA(A.data(), range<1>(M * K));
+        buffer<DataType, 1> bufB(B.data(), range<1>(K * N));
+        buffer<DataType, 1> bufC(C.data(), range<1>(M * N));
 
         // 矩阵乘法内核
-        q.submit([&](sycl::handler& h) {
-            auto accA = h.get_access<sycl::access::mode::read>(bufA);
-            auto accB = h.get_access<sycl::access::mode::read>(bufB);
-            auto accC = h.get_access<sycl::access::mode::write>(bufC);
+        q.submit([&](handler& h) {
+            auto accA = h.get_access<access::mode::read>(bufA);
+            auto accB = h.get_access<access::mode::read>(bufB);
+            auto accC = h.get_access<access::mode::write>(bufC);
 
-            h.parallel_for(sycl::range<2>(M, N), [=](sycl::id<2> id) {
+            h.parallel_for(range<2>(M, N), [=](id<2> id) {
                 int i = id[0];
                 int j = id[1];
                 
@@ -102,7 +104,7 @@ int main() {
         std::cout << "\nMatrix multiplication completed successfully!" << std::endl;
         return 0;
 
-    } catch (const sycl::exception& e) {
+    } catch (const exception& e) {
         std::cerr << "SYCL exception occurred: " << e.what() << std::endl;
         return 1;
     }

@@ -59,6 +59,7 @@ int main() {
             });
 
             e.wait();
+            q.wait_and_throw()
         }
 
         for(int i = 0; i < kSize; i++) {

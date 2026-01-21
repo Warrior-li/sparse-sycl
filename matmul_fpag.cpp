@@ -55,23 +55,23 @@ int main() {
                     VectorAdd(&accessor_a[0], &accessor_b[0], &accessor_c[0], kSize);
                 });
             });
-
-            for(int i = 0; i < kSize; i++) {
-                int expected = vec_a[i] + vec_b[i];
-                if(vec_c[i] != expected) {
-                    std::cout << "Mismatch at index " << i << ": "
-                              << "expected " << expected << ", got " << vec_c[i] << std::endl;
-                    passed = false;
-                    break;
-                }
-            }
-
-            std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
-
-            delete[] vec_a;
-            delete[] vec_b;
-            delete[] vec_c;
         }
+
+        for(int i = 0; i < kSize; i++) {
+            int expected = vec_a[i] + vec_b[i];
+            if(vec_c[i] != expected) {
+                std::cout << "Mismatch at index " << i << ": "
+                            << "expected " << expected << ", got " << vec_c[i] << std::endl;
+                passed = false;
+                break;
+            }
+        }
+
+        std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
+
+        delete[] vec_a;
+        delete[] vec_b;
+        delete[] vec_c;
     }
     catch(const std::exception& e)
     {

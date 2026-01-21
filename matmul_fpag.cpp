@@ -69,9 +69,9 @@ int main() {
         // 矩阵乘法内核
         q.submit([&](sycl::handler& h) {
             // 创建访问器
-            auto accA = h.get_access<cl::sycl::access::mode::read>(bufA);
-            auto accB = h.get_access<cl::sycl::access::mode::read>(bufB);
-            auto accC = h.get_access<sycl::access::mode::write>(bufC);
+            auto accA = bufA.get_access<cl::sycl::access::mode::read>(bufA);
+            auto accB = bufB.get_access<cl::sycl::access::mode::read>(bufB);
+            auto accC = bufC.get_access<cl::sycl::access::mode::write>(bufC);
 
             // 使用parallel_for进行矩阵乘法
             h.parallel_for(sycl::range<2>(M, N), [=](sycl::id<2> id) {

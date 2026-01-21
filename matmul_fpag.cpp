@@ -62,6 +62,8 @@ int main() {
             q.wait_and_throw();
         }
 
+        std::cout << "Verifying results..." << std::endl;
+
         for(int i = 0; i < kSize; i++) {
             int expected = vec_a[i] + vec_b[i];
             if(vec_c[i] != expected) {

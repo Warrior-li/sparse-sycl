@@ -54,7 +54,9 @@ int main() {
                 sycl::accessor accessor_c(buf_c, h, sycl::write_only, sycl::no_init);
 
                 h.single_task<VectorAddId>([=]() {
-                    VectorAdd(&accessor_a[0], &accessor_b[0], &accessor_c[0], kSize);
+                    for(int i = 0; i < kSize; i++) {
+                        accessor_c[i] = accessor_a[i] +  accessor_b[i];
+                    }
                 });
             });
 

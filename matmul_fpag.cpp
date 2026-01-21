@@ -4,6 +4,7 @@
 
 // 如果上面的头文件找不到，取消注释下面的行（SYCL 2020标准）:
 #include <CL/sycl.hpp>
+namespace sycl = cl::sycl;
 
 #include <iostream>
 #include <vector>
@@ -61,15 +62,15 @@ int main() {
         auto start = std::chrono::high_resolution_clock::now();
 
         // 创建缓冲区用于SYCL数据传输
-        sycl::buffer<DataType, 1> bufA(A.data(), sycl::range<1>(M * K));
-        sycl::buffer<DataType, 1> bufB(B.data(), sycl::range<1>(K * N));
-        sycl::buffer<DataType, 1> bufC(C.data(), sycl::range<1>(M * N));
+        cl::sycl::buffer<DataType, 1> bufA(A.data(), cl::sycl::range<1>(M * K));
+        cl::sycl::buffer<DataType, 1> bufB(B.data(), cl::sycl::range<1>(K * N));
+        cl::sycl::buffer<DataType, 1> bufC(C.data(), cl::sycl::range<1>(M * N));
 
         // 矩阵乘法内核
         q.submit([&](sycl::handler& h) {
             // 创建访问器
-            auto accA = h.get_access<sycl::access::mode::read>(bufA);
-            auto accB = h.get_access<sycl::access::mode::read>(bufB);
+            auto accA = h.get_access<cl::sycl::access::mode::read>(bufA);
+            auto accB = h.get_access<cl::sycl::access::mode::read>(bufB);
             auto accC = h.get_access<sycl::access::mode::write>(bufC);
 
             // 使用parallel_for进行矩阵乘法

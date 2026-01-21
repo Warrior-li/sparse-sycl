@@ -1,11 +1,4 @@
-// 根据SYCL版本选择相应的头文件
-// Intel oneAPI SYCL (新版):
-// #include <sycl/sycl.hpp>
-
-// 如果上面的头文件找不到，取消注释下面的行（SYCL 2020标准）:
-#include <CL/sycl.hpp>
-namespace sycl = cl::sycl;
-
+#include <sycl/sycl.hpp>
 #include <iostream>
 #include <vector>
 #include <chrono>
@@ -31,7 +24,7 @@ void initMatrixB(std::vector<DataType>& B) {
     }
 }
 
-// 验证结果（可选）
+// 验证结果
 void verifyResult(const std::vector<DataType>& C) {
     DataType sum = 0;
     for (int i = 0; i < M * N; i++) {
@@ -42,8 +35,7 @@ void verifyResult(const std::vector<DataType>& C) {
 
 int main() {
     try {
-        // 创建SYCL队列，可在FPGA上执行
-        // 对于Intel FPGA，通常使用FPGA选择器
+        // 创建SYCL队列
         sycl::queue q(sycl::default_selector_v);
         
         std::cout << "Running on device: " 
@@ -62,18 +54,16 @@ int main() {
         auto start = std::chrono::high_resolution_clock::now();
 
         // 创建缓冲区用于SYCL数据传输
-        cl::sycl::buffer<DataType, 1> bufA(A.data(), cl::sycl::range<1>(M * K));
-        cl::sycl::buffer<DataType, 1> bufB(B.data(), cl::sycl::range<1>(K * N));
-        cl::sycl::buffer<DataType, 1> bufC(C.data(), cl::sycl::range<1>(M * N));
+        sycl::buffer<DataType, 1> bufA(A.data(), sycl::range<1>(M * K));
+        sycl::buffer<DataType, 1> bufB(B.data(), sycl::range<1>(K * N));
+        sycl::buffer<DataType, 1> bufC(C.data(), sycl::range<1>(M * N));
 
         // 矩阵乘法内核
         q.submit([&](sycl::handler& h) {
-            // 创建访问器
-            auto accA = bufA.get_access<cl::sycl::access::mode::read>(bufA);
-            auto accB = bufB.get_access<cl::sycl::access::mode::read>(bufB);
-            auto accC = bufC.get_access<cl::sycl::access::mode::write>(bufC);
+            auto accA = h.get_access<sycl::access::mode::read>(bufA);
+            auto accB = h.get_access<sycl::access::mode::read>(bufB);
+            auto accC = h.get_access<sycl::access::mode::write>(bufC);
 
-            // 使用parallel_for进行矩阵乘法
             h.parallel_for(sycl::range<2>(M, N), [=](sycl::id<2> id) {
                 int i = id[0];
                 int j = id[1];
@@ -116,4 +106,5 @@ int main() {
         std::cerr << "SYCL exception occurred: " << e.what() << std::endl;
         return 1;
     }
+}
 }

@@ -41,12 +41,14 @@ int main() {
             vec_b[i] = (kSize- i);
         }
 
+        std::cout << "add two vectors of size " << kSize << std::endl;
+
         {
             sycl::buffer<int, 1> buf_a(vec_a, sycl::range<1>(kSize));
             sycl::buffer<int, 1> buf_b(vec_b, sycl::range<1>(kSize));
             sycl::buffer<int, 1> buf_c(vec_c, sycl::range<1>(kSize));
 
-            q.submit([&](sycl::handler& h) {
+            auto e = q.submit([&](sycl::handler& h) {
                 sycl::accessor accessor_a(buf_a, h, sycl::read_only);
                 sycl::accessor accessor_b(buf_b, h, sycl::read_only);
                 sycl::accessor accessor_c(buf_c, h, sycl::write_only, sycl::no_init);
@@ -55,6 +57,8 @@ int main() {
                     VectorAdd(&accessor_a[0], &accessor_b[0], &accessor_c[0], kSize);
                 });
             });
+
+            e.wait();
         }
 
         for(int i = 0; i < kSize; i++) {
